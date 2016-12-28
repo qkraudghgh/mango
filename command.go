@@ -144,43 +144,19 @@ func doneFunc(args []string) error {
 	nArgs := len(args)
 
 	if nArgs > 1 {
-		return errors.New("Invalid arguments: delete command could take one argument at most")
+		return errors.New("Invalid arguments: this command could take one argument at most")
 	}
-
-	db, err := bolt.Open(mangoDB, 0755, &bolt.Options{Timeout: 1 * time.Second})
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
 	var todoNo int
-	var oldTodo Todo
+	var err error
 
-	if nArgs == 1 {
+	if len(args) == 1 {
 		if todoNo, err = strconv.Atoi(args[0]); err != nil {
 			return errors.New("Integer is allowed only")
 		}
 	}
 
-	db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(mangoBucket))
-		v := b.Get(itob(todoNo))
-
-		json.Unmarshal(v, &oldTodo)
-		return nil
-	})
-
-	oldTodo.IsCheck = 1
-
-	db.Update(func(tx *bolt.Tx) error {
-		encoded, err := json.Marshal(oldTodo)
-		if err != nil {
-			return err
-		}
-
-		b := tx.Bucket([]byte(mangoBucket))
-		return b.Put(itob(todoNo), encoded)
-	})
+	updateIsChecked(todoNo, 1)
 
 	return nil
 }
@@ -189,33 +165,39 @@ func unDoneFunc(args []string) error {
 	nArgs := len(args)
 
 	if nArgs > 1 {
-		return errors.New("Invalid arguments: delete command could take one argument at most")
+		return errors.New("Invalid arguments: this command could take one argument at most")
 	}
 
+	var todoNo int
+	var err error
+
+	if todoNo, err = strconv.Atoi(args[0]); err != nil {
+		return errors.New("Integer is allowed only")
+	}
+
+	updateIsChecked(todoNo, 0)
+
+	return nil
+}
+
+func updateIsChecked(keyId int, isCheck int) error {
 	db, err := bolt.Open(mangoDB, 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	var todoNo int
 	var oldTodo Todo
-
-	if nArgs == 1 {
-		if todoNo, err = strconv.Atoi(args[0]); err != nil {
-			return errors.New("Integer is allowed only")
-		}
-	}
 
 	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(mangoBucket))
-		v := b.Get(itob(todoNo))
+		v := b.Get(itob(keyId))
 
 		json.Unmarshal(v, &oldTodo)
 		return nil
 	})
 
-	oldTodo.IsCheck = 0
+	oldTodo.IsCheck = isCheck
 
 	db.Update(func(tx *bolt.Tx) error {
 		encoded, err := json.Marshal(oldTodo)
@@ -224,7 +206,7 @@ func unDoneFunc(args []string) error {
 		}
 
 		b := tx.Bucket([]byte(mangoBucket))
-		return b.Put(itob(todoNo), encoded)
+		return b.Put(itob(keyId), encoded)
 	})
 
 	return nil
