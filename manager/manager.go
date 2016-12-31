@@ -6,6 +6,9 @@ import (
 	"runtime"
 	"os"
 	"path/filepath"
+	"github.com/boltdb/bolt"
+	"time"
+	"log"
 )
 
 const MangoBucket = "todos"
@@ -79,4 +82,21 @@ func GetDbPath() string {
 	dbPath := filepath.Join(os.Getenv("HOME"), ".mango.db")
 
 	return dbPath
+}
+
+func CheckBucketAndMake() {
+	db, err := bolt.Open(GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte(MangoBucket))
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

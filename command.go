@@ -69,9 +69,7 @@ func addFunc(args []string) error {
 func deleteFunc(args []string) error {
 	nArgs := len(args)
 
-	if nArgs > 1 {
-		return errors.New("Invalid arguments: delete command could take one argument at most")
-	}
+	manager.CheckBucketAndMake()
 
 	db, err := bolt.Open(manager.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
@@ -140,6 +138,8 @@ func listFunc(args []string) error {
 func doneFunc(args []string) error {
 	nArgs := len(args)
 
+	manager.CheckBucketAndMake()
+
 	if nArgs > 1 {
 		return errors.New("Invalid arguments: this command could take one argument at most")
 	}
@@ -160,6 +160,8 @@ func doneFunc(args []string) error {
 
 func unDoneFunc(args []string) error {
 	nArgs := len(args)
+
+	manager.CheckBucketAndMake()
 
 	if nArgs > 1 {
 		return errors.New("Invalid arguments: this command could take one argument at most")
