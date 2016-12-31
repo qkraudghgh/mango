@@ -22,7 +22,7 @@ func PrintTodos(todos []Todo) {
 
 		// TODO: sort unDone, Done
 		for _, todo := range todos {
-			fmt.Printf("\n(%d) [%s] %s\n", todo.ID, checkStamp(todo.IsCheck), bold(todo.Content))
+			fmt.Printf("\n %d. %s %s\n", todo.ID, checkStamp(todo.IsCheck), bold(todo.Content))
 		}
 
 		fmt.Println()
