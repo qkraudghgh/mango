@@ -8,16 +8,25 @@ import (
 	"github.com/qkraudghgh/mango/manager"
 )
 
-const usage = `Usage:
-	mango list
-		Show all tasks
-	mango add
-		Add todo task
-	mango done [number]
-		Check done todo task
-	mango undone [number]
-		Uncheck done todo task
-	mango delete [number]
+const usage = `
+NAME:
+   mango - very simple todo app in your terminal
+
+USAGE:
+   mango command [arguments...]
+
+VERSION:
+   1.0.0
+
+AUTHOR:
+  myoungho.pak - <qkraudghgh@gmail.com>
+
+COMMANDS:
+   list - Show your todos
+   add "your todo" - Add your todo
+   done [number] - check done your todo
+   undone [number] - uncheck done your todo
+   delete [number] - delete your todo
 `
 
 func main() {
