@@ -158,6 +158,8 @@ func doneFunc(args []string) error {
 
 	updateIsChecked(todoNo, 1)
 
+	fmt.Printf("Todo #%d was done\n", todoNo)
+
 	return nil
 }
 
@@ -176,6 +178,8 @@ func unDoneFunc(args []string) error {
 	}
 
 	updateIsChecked(todoNo, 0)
+
+	fmt.Printf("Todo #%d was undone\n", todoNo)
 
 	return nil
 }
