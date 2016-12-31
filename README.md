@@ -12,10 +12,10 @@
 
 **mango** is very simple todo app in your terminal.
 
-If you want to add todo, you can.
-If you want to check done, you can.
-If you want to uncheck done, you can.
-If you want to delete todo, you can.
+- If you want to add todo, you can.
+- If you want to check done, you can.
+- If you want to uncheck done, you can.
+- If you want to delete todo, you can.
 
 That's all
 
