@@ -5,18 +5,22 @@ import (
 	"fmt"
 )
 
+// MangoBucket is global bucket name
 const MangoBucket = "todos"
 
+// Manager structure
 type Manager struct {
 	commands map[string]Command
 }
 
+// Command structure
 type Command struct {
 	Name  string
 	Usage string
 	Run   func([]string) error
 }
 
+// New function make new manager
 func New() *Manager {
 	return &Manager{
 		commands: make(map[string]Command),
@@ -34,6 +38,7 @@ func (m *Manager) Usage() string {
 	return buf.String()
 }
 
+// AddCommand method is add New Command
 func (m *Manager) AddCommand(cmd Command) {
 	m.commands[cmd.Name] = cmd
 }

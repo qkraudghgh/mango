@@ -17,7 +17,7 @@ type Todo struct {
 	IsCheck   int       `json:"is_check"`
 }
 
-// Print Todos func
+// PrintTodos is draw todo tasks to terminal
 func PrintTodos(todos []Todo) {
 	if len(todos) > 0 {
 		bold := color.New(color.Bold).SprintFunc()

@@ -30,7 +30,7 @@ func GetDbPath() string {
 	return dbPath
 }
 
-// This function check bucket, and If not exist make bucket
+// CheckBucketAndMake function check bucket, and If not exist make bucket
 func CheckBucketAndMake() {
 	db, err := bolt.Open(GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
@@ -48,7 +48,7 @@ func CheckBucketAndMake() {
 	})
 }
 
-// Check the key is stored and return an error if not
+// CheckKey function is stored and return an error if not
 func CheckKey(key int) error {
 	db, err := bolt.Open(GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
@@ -69,14 +69,14 @@ func CheckKey(key int) error {
 	return err
 }
 
-// convert integer to byte
+// Itob function convert integer to byte
 func Itob(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
 	return b
 }
 
-// this function check Arguments length and type
+// ValidateArgs function check Arguments length and type
 func ValidateArgs(args []string) (int, error) {
 	nArgs := len(args)
 
