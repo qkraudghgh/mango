@@ -14,7 +14,7 @@ import (
 	"github.com/qkraudghgh/mango/manager"
 )
 
-// GetHomeDir gets home directory corresponding to each OS.
+// GetDbPath gets dbPath corresponding to each OS.
 func GetDbPath() string {
 	if runtime.GOOS == "windows" {
 		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
@@ -30,6 +30,7 @@ func GetDbPath() string {
 	return dbPath
 }
 
+// This function check bucket, and If not exist make bucket
 func CheckBucketAndMake() {
 	db, err := bolt.Open(GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
@@ -47,6 +48,7 @@ func CheckBucketAndMake() {
 	})
 }
 
+// Check the key is stored and return an error if not
 func CheckKey(key int) error {
 	db, err := bolt.Open(GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
@@ -67,12 +69,14 @@ func CheckKey(key int) error {
 	return err
 }
 
+// convert integer to byte
 func Itob(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
 	return b
 }
 
+// this function check Arguments length and type
 func ValidateArgs(args []string) (int, error) {
 	nArgs := len(args)
 

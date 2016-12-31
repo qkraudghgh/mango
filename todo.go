@@ -9,6 +9,7 @@ import (
 	"github.com/qkraudghgh/mango/printer"
 )
 
+// Todo task structure
 type Todo struct {
 	ID        int       `json:"id"`
 	Content   string    `json:"content"`
@@ -16,6 +17,7 @@ type Todo struct {
 	IsCheck   int       `json:"is_check"`
 }
 
+// Print Todos func
 func PrintTodos(todos []Todo) {
 	if len(todos) > 0 {
 		bold := color.New(color.Bold).SprintFunc()
@@ -31,12 +33,14 @@ func PrintTodos(todos []Todo) {
 	}
 }
 
+// return different check symbol depend on OS
 func checkStamp(isCheck int) string {
 	var symbol string
 
 	green := color.New(color.FgGreen).SprintfFunc()
 	red := color.New(color.FgRed).SprintfFunc()
 
+	// check OS
 	if runtime.GOOS == "windows" {
 		if isCheck == 1 {
 			symbol = green(printer.DoneSignW)

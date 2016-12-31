@@ -40,23 +40,27 @@ var (
 	}
 )
 
+// mango add 'todo'
 func addFunc(args []string) error {
 	if len(args) != 1 {
 		return errors.New("add command needs only one argument")
 	}
 
+	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
+	// make structure TODO
 	newTodo := Todo{
 		Content:   args[0],
 		CreatedAt: time.Now(),
 		IsCheck:   0,
 	}
 
+	// save Todo
 	err = newTodo.save(db)
 	if err != nil {
 		return errors.New("Error Write the todo to file")
@@ -65,6 +69,7 @@ func addFunc(args []string) error {
 	return nil
 }
 
+// mango delete [number]
 func deleteFunc(args []string) error {
 	todoNo, err := mangoUtils.ValidateArgs(args)
 	if err != nil {
@@ -72,19 +77,23 @@ func deleteFunc(args []string) error {
 		return nil
 	}
 
+	// If not exist bucket, make bucket
 	mangoUtils.CheckBucketAndMake()
 
+	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
+	// check data from key
 	err = mangoUtils.CheckKey(todoNo)
 	if err != nil {
 		return err
 	}
 
+	// delete data
 	err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(manager.MangoBucket))
 		err := b.Delete(mangoUtils.Itob(todoNo))
@@ -103,13 +112,16 @@ func deleteFunc(args []string) error {
 	return nil
 }
 
+// mango list
 func listFunc(args []string) error {
 	if len(args) != 0 {
 		return errors.New("The list command do not use argument")
 	}
 
+	// If not exist bucket, make bucket
 	mangoUtils.CheckBucketAndMake()
 
+	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
@@ -118,6 +130,7 @@ func listFunc(args []string) error {
 
 	todos := []Todo{}
 
+	// make Json object array [{Id: 1, IsCheck: 1, Content: "blah blah"}, ...]
 	err = db.View(func(tx *bolt.Tx) error {
 		// Assume bucket exists and has keys
 		b := tx.Bucket([]byte(manager.MangoBucket))
@@ -134,25 +147,32 @@ func listFunc(args []string) error {
 		return nil
 	})
 
+	// print todos
 	PrintTodos(todos)
 
 	return nil
 }
 
+// mango done [number]
 func doneFunc(args []string) error {
+
+	// validate arguments
 	todoNo, err := mangoUtils.ValidateArgs(args)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
+	// If not exist bucket, make bucket
 	mangoUtils.CheckBucketAndMake()
 
+	// check data from key
 	err = mangoUtils.CheckKey(todoNo)
 	if err != nil {
 		return err
 	}
 
+	// update isCheck to true
 	updateIsChecked(todoNo, 1)
 
 	fmt.Printf("Todo #%d was done\n", todoNo)
@@ -160,20 +180,26 @@ func doneFunc(args []string) error {
 	return nil
 }
 
+// mango undone [number]
 func unDoneFunc(args []string) error {
+
+	// validate arguments
 	todoNo, err := mangoUtils.ValidateArgs(args)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
+	// If not exist bucket, make bucket
 	mangoUtils.CheckBucketAndMake()
 
+	// check data from key
 	err = mangoUtils.CheckKey(todoNo)
 	if err != nil {
 		return err
 	}
 
+	// update isCheck to false
 	updateIsChecked(todoNo, 0)
 
 	fmt.Printf("Todo #%d was undone\n", todoNo)
@@ -181,7 +207,10 @@ func unDoneFunc(args []string) error {
 	return nil
 }
 
+// this function update 'isCheck' value from key
 func updateIsChecked(keyId int, isCheck int) error {
+
+	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
@@ -190,6 +219,7 @@ func updateIsChecked(keyId int, isCheck int) error {
 
 	var oldTodo Todo
 
+	// store data to oldTodo
 	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(manager.MangoBucket))
 		v := b.Get(mangoUtils.Itob(keyId))
@@ -198,8 +228,10 @@ func updateIsChecked(keyId int, isCheck int) error {
 		return nil
 	})
 
+	// modify isCheck value
 	oldTodo.IsCheck = isCheck
 
+	// update todo value
 	db.Update(func(tx *bolt.Tx) error {
 		encoded, err := json.Marshal(oldTodo)
 		if err != nil {
@@ -213,14 +245,16 @@ func updateIsChecked(keyId int, isCheck int) error {
 	return nil
 }
 
+// save todo method
 func (todo *Todo) save(db *bolt.DB) error {
-	// Store the user model in the user bucket using the username as the key.
 	err := db.Update(func(tx *bolt.Tx) error {
+		// If not exist bucket, make bucket
 		b, err := tx.CreateBucketIfNotExists([]byte(manager.MangoBucket))
 		if err != nil {
 			return err
 		}
 
+		// auto increment id (Primary key)
 		id, _ := b.NextSequence()
 		todo.ID = int(id)
 
