@@ -116,6 +116,15 @@ func listFunc(args []string) error {
 	}
 	defer db.Close()
 
+	err = db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte(mangoBucket))
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	todos := []Todo{}
 
 	err = db.View(func(tx *bolt.Tx) error {
