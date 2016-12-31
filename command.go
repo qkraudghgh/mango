@@ -42,7 +42,6 @@ var (
 )
 
 const (
-	mangoDB     = "mango.db"
 	mangoBucket = "todos"
 )
 
@@ -51,7 +50,7 @@ func addFunc(args []string) error {
 		return errors.New("add command needs only one argument")
 	}
 
-	db, err := bolt.Open(mangoDB, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(manager.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,7 +77,7 @@ func deleteFunc(args []string) error {
 		return errors.New("Invalid arguments: delete command could take one argument at most")
 	}
 
-	db, err := bolt.Open(mangoDB, 0755, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(manager.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,7 +110,7 @@ func deleteFunc(args []string) error {
 }
 
 func listFunc(args []string) error {
-	db, err := bolt.Open(mangoDB, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(manager.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -181,7 +180,7 @@ func unDoneFunc(args []string) error {
 }
 
 func updateIsChecked(keyId int, isCheck int) error {
-	db, err := bolt.Open(mangoDB, 0755, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(manager.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}

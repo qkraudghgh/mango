@@ -3,6 +3,9 @@ package manager
 import (
 	"bytes"
 	"fmt"
+	"runtime"
+	"os"
+	"path/filepath"
 )
 
 type Manager struct {
@@ -58,4 +61,20 @@ func (m *Manager) Execute(args []string) error {
 	}
 
 	return nil
+}
+
+// GetHomeDir gets home directory corresponding to each OS.
+func GetDbPath() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+
+		return home
+	}
+
+	dbPath := filepath.Join(os.Getenv("HOME"), ".mango.db")
+
+	return dbPath
 }
