@@ -208,7 +208,7 @@ func unDoneFunc(args []string) error {
 }
 
 // this function update 'isCheck' value from key
-func updateIsChecked(keyId int, isCheck int) error {
+func updateIsChecked(keyID int, isCheck int) error {
 
 	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
@@ -222,7 +222,7 @@ func updateIsChecked(keyId int, isCheck int) error {
 	// store data to oldTodo
 	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(manager.MangoBucket))
-		v := b.Get(mangoUtils.Itob(keyId))
+		v := b.Get(mangoUtils.Itob(keyID))
 
 		json.Unmarshal(v, &oldTodo)
 		return nil
@@ -239,7 +239,7 @@ func updateIsChecked(keyId int, isCheck int) error {
 		}
 
 		b := tx.Bucket([]byte(manager.MangoBucket))
-		return b.Put(mangoUtils.Itob(keyId), encoded)
+		return b.Put(mangoUtils.Itob(keyID), encoded)
 	})
 
 	return nil
