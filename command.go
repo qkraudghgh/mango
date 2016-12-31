@@ -78,7 +78,7 @@ func deleteFunc(args []string) error {
 	}
 
 	// If not exist bucket, make bucket
-	mangoUtils.CheckBucketAndMake()
+	err = mangoUtils.CheckBucketAndMake()
 
 	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
@@ -119,7 +119,7 @@ func listFunc(args []string) error {
 	}
 
 	// If not exist bucket, make bucket
-	mangoUtils.CheckBucketAndMake()
+	err := mangoUtils.CheckBucketAndMake()
 
 	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
@@ -150,7 +150,7 @@ func listFunc(args []string) error {
 	// print todos
 	PrintTodos(todos)
 
-	return nil
+	return err
 }
 
 // mango done [number]
@@ -164,7 +164,7 @@ func doneFunc(args []string) error {
 	}
 
 	// If not exist bucket, make bucket
-	mangoUtils.CheckBucketAndMake()
+	err = mangoUtils.CheckBucketAndMake()
 
 	// check data from key
 	err = mangoUtils.CheckKey(todoNo)
@@ -191,7 +191,7 @@ func unDoneFunc(args []string) error {
 	}
 
 	// If not exist bucket, make bucket
-	mangoUtils.CheckBucketAndMake()
+	err = mangoUtils.CheckBucketAndMake()
 
 	// check data from key
 	err = mangoUtils.CheckKey(todoNo)

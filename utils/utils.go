@@ -31,7 +31,7 @@ func GetDbPath() string {
 }
 
 // CheckBucketAndMake function check bucket, and If not exist make bucket
-func CheckBucketAndMake() {
+func CheckBucketAndMake() error {
 	db, err := bolt.Open(GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
@@ -46,6 +46,8 @@ func CheckBucketAndMake() {
 
 		return nil
 	})
+
+	return err
 }
 
 // CheckKey function is stored and return an error if not
