@@ -3,6 +3,6 @@
 package printer
 
 const (
-	DoneSignW = "V"
+	DoneSignW   = "V"
 	UndoneSignW = "X"
 )
