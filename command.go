@@ -85,6 +85,11 @@ func deleteFunc(args []string) error {
 		}
 	}
 
+	err = checkKey(todoNo)
+	if err != nil {
+		return err
+	}
+
 	err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(manager.MangoBucket))
 		err := b.Delete(itob(todoNo))
@@ -153,6 +158,11 @@ func doneFunc(args []string) error {
 		}
 	}
 
+	err = checkKey(todoNo)
+	if err != nil {
+		return err
+	}
+
 	updateIsChecked(todoNo, 1)
 
 	return nil
@@ -172,6 +182,11 @@ func unDoneFunc(args []string) error {
 
 	if todoNo, err = strconv.Atoi(args[0]); err != nil {
 		return errors.New("Integer is allowed only")
+	}
+
+	err = checkKey(todoNo)
+	if err != nil {
+		return err
 	}
 
 	updateIsChecked(todoNo, 0)
@@ -228,6 +243,26 @@ func (todo *Todo) save(db *bolt.DB) error {
 		}
 		return b.Put(itob(todo.ID), encoded)
 	})
+	return err
+}
+
+func checkKey(key int) error {
+	db, err := bolt.Open(manager.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	err = db.View(func(tx *bolt.Tx) error {
+		// Assume bucket exists and has keys
+		b := tx.Bucket([]byte(manager.MangoBucket))
+		v := b.Get(itob(key))
+		if v == nil {
+			return errors.New("That todo does not exist")
+		}
+		return nil
+	})
+
 	return err
 }
 
