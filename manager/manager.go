@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 )
 
+const MangoBucket = "todos"
+
 type Manager struct {
 	commands map[string]Command
 }

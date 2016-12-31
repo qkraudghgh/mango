@@ -41,10 +41,6 @@ var (
 	}
 )
 
-const (
-	mangoBucket = "todos"
-)
-
 func addFunc(args []string) error {
 	if len(args) != 1 {
 		return errors.New("add command needs only one argument")
@@ -92,7 +88,7 @@ func deleteFunc(args []string) error {
 	}
 
 	err = db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(mangoBucket))
+		b := tx.Bucket([]byte(manager.MangoBucket))
 		err := b.Delete(itob(todoNo))
 		if err != nil {
 			return err
@@ -110,26 +106,19 @@ func deleteFunc(args []string) error {
 }
 
 func listFunc(args []string) error {
+	manager.CheckBucketAndMake()
+
 	db, err := bolt.Open(manager.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(mangoBucket))
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-
 	todos := []Todo{}
 
 	err = db.View(func(tx *bolt.Tx) error {
 		// Assume bucket exists and has keys
-		b := tx.Bucket([]byte(mangoBucket))
+		b := tx.Bucket([]byte(manager.MangoBucket))
 
 		b.ForEach(func(k, v []byte) error {
 			var todo Todo
@@ -198,7 +187,7 @@ func updateIsChecked(keyId int, isCheck int) error {
 	var oldTodo Todo
 
 	db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(mangoBucket))
+		b := tx.Bucket([]byte(manager.MangoBucket))
 		v := b.Get(itob(keyId))
 
 		json.Unmarshal(v, &oldTodo)
@@ -213,7 +202,7 @@ func updateIsChecked(keyId int, isCheck int) error {
 			return err
 		}
 
-		b := tx.Bucket([]byte(mangoBucket))
+		b := tx.Bucket([]byte(manager.MangoBucket))
 		return b.Put(itob(keyId), encoded)
 	})
 
@@ -223,7 +212,7 @@ func updateIsChecked(keyId int, isCheck int) error {
 func (todo *Todo) save(db *bolt.DB) error {
 	// Store the user model in the user bucket using the username as the key.
 	err := db.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(mangoBucket))
+		b, err := tx.CreateBucketIfNotExists([]byte(manager.MangoBucket))
 		if err != nil {
 			return err
 		}
