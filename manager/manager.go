@@ -3,12 +3,6 @@ package manager
 import (
 	"bytes"
 	"fmt"
-	"runtime"
-	"os"
-	"path/filepath"
-	"github.com/boltdb/bolt"
-	"time"
-	"log"
 )
 
 const MangoBucket = "todos"
@@ -66,37 +60,4 @@ func (m *Manager) Execute(args []string) error {
 	}
 
 	return nil
-}
-
-// GetHomeDir gets home directory corresponding to each OS.
-func GetDbPath() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-
-		return home
-	}
-
-	dbPath := filepath.Join(os.Getenv("HOME"), ".mango.db")
-
-	return dbPath
-}
-
-func CheckBucketAndMake() {
-	db, err := bolt.Open(GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(MangoBucket))
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
 }

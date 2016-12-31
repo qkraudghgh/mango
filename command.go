@@ -4,13 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
-	"encoding/binary"
 	"github.com/boltdb/bolt"
 	"github.com/qkraudghgh/mango/manager"
-	"log"
-	"strconv"
+	"github.com/qkraudghgh/mango/utils"
 )
 
 var (
@@ -42,13 +41,11 @@ var (
 )
 
 func addFunc(args []string) error {
-	_, err := validateArgs(args)
-	if err != nil {
-		fmt.Println(err)
-		return nil
+	if len(args) != 1 {
+		return errors.New("add command needs only one argument")
 	}
 
-	db, err := bolt.Open(manager.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(mangoUtils.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,28 +66,28 @@ func addFunc(args []string) error {
 }
 
 func deleteFunc(args []string) error {
-	todoNo, err := validateArgs(args)
+	todoNo, err := mangoUtils.ValidateArgs(args)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	manager.CheckBucketAndMake()
+	mangoUtils.CheckBucketAndMake()
 
-	db, err := bolt.Open(manager.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(mangoUtils.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	err = checkKey(todoNo)
+	err = mangoUtils.CheckKey(todoNo)
 	if err != nil {
 		return err
 	}
 
 	err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(manager.MangoBucket))
-		err := b.Delete(itob(todoNo))
+		err := b.Delete(mangoUtils.Itob(todoNo))
 		if err != nil {
 			return err
 		}
@@ -111,9 +108,9 @@ func listFunc(args []string) error {
 		return errors.New("The list command do not use argument")
 	}
 
-	manager.CheckBucketAndMake()
+	mangoUtils.CheckBucketAndMake()
 
-	db, err := bolt.Open(manager.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(mangoUtils.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -143,15 +140,15 @@ func listFunc(args []string) error {
 }
 
 func doneFunc(args []string) error {
-	todoNo, err := validateArgs(args)
+	todoNo, err := mangoUtils.ValidateArgs(args)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	manager.CheckBucketAndMake()
+	mangoUtils.CheckBucketAndMake()
 
-	err = checkKey(todoNo)
+	err = mangoUtils.CheckKey(todoNo)
 	if err != nil {
 		return err
 	}
@@ -164,15 +161,15 @@ func doneFunc(args []string) error {
 }
 
 func unDoneFunc(args []string) error {
-	todoNo, err := validateArgs(args)
+	todoNo, err := mangoUtils.ValidateArgs(args)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	manager.CheckBucketAndMake()
+	mangoUtils.CheckBucketAndMake()
 
-	err = checkKey(todoNo)
+	err = mangoUtils.CheckKey(todoNo)
 	if err != nil {
 		return err
 	}
@@ -185,7 +182,7 @@ func unDoneFunc(args []string) error {
 }
 
 func updateIsChecked(keyId int, isCheck int) error {
-	db, err := bolt.Open(manager.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
+	db, err := bolt.Open(mangoUtils.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -195,7 +192,7 @@ func updateIsChecked(keyId int, isCheck int) error {
 
 	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(manager.MangoBucket))
-		v := b.Get(itob(keyId))
+		v := b.Get(mangoUtils.Itob(keyId))
 
 		json.Unmarshal(v, &oldTodo)
 		return nil
@@ -210,7 +207,7 @@ func updateIsChecked(keyId int, isCheck int) error {
 		}
 
 		b := tx.Bucket([]byte(manager.MangoBucket))
-		return b.Put(itob(keyId), encoded)
+		return b.Put(mangoUtils.Itob(keyId), encoded)
 	})
 
 	return nil
@@ -231,50 +228,7 @@ func (todo *Todo) save(db *bolt.DB) error {
 		if err != nil {
 			return err
 		}
-		return b.Put(itob(todo.ID), encoded)
+		return b.Put(mangoUtils.Itob(todo.ID), encoded)
 	})
 	return err
-}
-
-func checkKey(key int) error {
-	db, err := bolt.Open(manager.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	err = db.View(func(tx *bolt.Tx) error {
-		// Assume bucket exists and has keys
-		b := tx.Bucket([]byte(manager.MangoBucket))
-		v := b.Get(itob(key))
-		if v == nil {
-			return errors.New("That todo does not exist")
-		}
-		return nil
-	})
-
-	return err
-}
-
-func itob(v int) []byte {
-	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, uint64(v))
-	return b
-}
-
-func validateArgs(args []string) (int, error) {
-	nArgs := len(args)
-
-	var todoNo int
-	var err error
-
-	if nArgs != 1 {
-		err = errors.New("Invalid arguments: this command could take one argument at most")
-	} else {
-		if todoNo, err = strconv.Atoi(args[0]); err != nil {
-			err = errors.New("Integer is allowed only")
-		}
-	}
-
-	return todoNo, err
 }
