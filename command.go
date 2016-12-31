@@ -42,8 +42,10 @@ var (
 )
 
 func addFunc(args []string) error {
-	if len(args) != 1 {
-		return errors.New("add command needs only one argument")
+	_, err := validateArgs(args)
+	if err != nil {
+		fmt.Println(err)
+		return nil
 	}
 
 	db, err := bolt.Open(manager.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
@@ -67,7 +69,11 @@ func addFunc(args []string) error {
 }
 
 func deleteFunc(args []string) error {
-	nArgs := len(args)
+	todoNo, err := validateArgs(args)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
 
 	manager.CheckBucketAndMake()
 
@@ -76,14 +82,6 @@ func deleteFunc(args []string) error {
 		log.Fatal(err)
 	}
 	defer db.Close()
-
-	var todoNo int
-
-	if nArgs == 1 {
-		if todoNo, err = strconv.Atoi(args[0]); err != nil {
-			return errors.New("Integer is allowed only")
-		}
-	}
 
 	err = checkKey(todoNo)
 	if err != nil {
@@ -109,6 +107,10 @@ func deleteFunc(args []string) error {
 }
 
 func listFunc(args []string) error {
+	if len(args) != 0 {
+		return errors.New("The list command do not use argument")
+	}
+
 	manager.CheckBucketAndMake()
 
 	db, err := bolt.Open(manager.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
@@ -141,22 +143,13 @@ func listFunc(args []string) error {
 }
 
 func doneFunc(args []string) error {
-	nArgs := len(args)
+	todoNo, err := validateArgs(args)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
 
 	manager.CheckBucketAndMake()
-
-	if nArgs > 1 {
-		return errors.New("Invalid arguments: this command could take one argument at most")
-	}
-
-	var todoNo int
-	var err error
-
-	if len(args) == 1 {
-		if todoNo, err = strconv.Atoi(args[0]); err != nil {
-			return errors.New("Integer is allowed only")
-		}
-	}
 
 	err = checkKey(todoNo)
 	if err != nil {
@@ -169,20 +162,13 @@ func doneFunc(args []string) error {
 }
 
 func unDoneFunc(args []string) error {
-	nArgs := len(args)
+	todoNo, err := validateArgs(args)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
 
 	manager.CheckBucketAndMake()
-
-	if nArgs > 1 {
-		return errors.New("Invalid arguments: this command could take one argument at most")
-	}
-
-	var todoNo int
-	var err error
-
-	if todoNo, err = strconv.Atoi(args[0]); err != nil {
-		return errors.New("Integer is allowed only")
-	}
 
 	err = checkKey(todoNo)
 	if err != nil {
@@ -270,4 +256,21 @@ func itob(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))
 	return b
+}
+
+func validateArgs(args []string) (int, error) {
+	nArgs := len(args)
+
+	var todoNo int
+	var err error
+
+	if nArgs != 1 {
+		err = errors.New("Invalid arguments: this command could take one argument at most")
+	} else {
+		if todoNo, err = strconv.Atoi(args[0]); err != nil {
+			err = errors.New("Integer is allowed only")
+		}
+	}
+
+	return todoNo, err
 }
