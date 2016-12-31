@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/qkraudghgh/mango)](https://goreportcard.com/report/github.com/qkraudghgh/mango) [![Build Status](https://travis-ci.org/qkraudghgh/mango.svg?branch=master)](https://travis-ci.org/qkraudghgh/mango)
+
 > Very simple todo app in your terminal.
 >
 > ![Screenshot](image/mango_usage.gif)
