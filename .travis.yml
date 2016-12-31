@@ -5,4 +5,6 @@ go:
   - 1.7
   - master
 
-install: go get github.com/fatih/color
+install:
+  - go get github.com/fatih/color
+  - go get github.com/boltdb/bolt
