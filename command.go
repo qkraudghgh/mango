@@ -178,7 +178,7 @@ func doneFunc(args []string) error {
 	}
 
 	// update isCheck to true
-	if err:= updateIsChecked(todoNo, 1); err != nil {
+	if err := updateIsChecked(todoNo, 1); err != nil {
 		return err
 	}
 
@@ -208,7 +208,7 @@ func unDoneFunc(args []string) error {
 	}
 
 	// update isCheck to false
-	if err:= updateIsChecked(todoNo, 0); err != nil {
+	if err := updateIsChecked(todoNo, 0); err != nil {
 		return err
 	}
 
