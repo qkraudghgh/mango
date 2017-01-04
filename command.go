@@ -61,8 +61,7 @@ func addFunc(args []string) error {
 	}
 
 	// save Todo
-	err = newTodo.save(db)
-	if err != nil {
+	if err := newTodo.save(db); err != nil {
 		return errors.New("Error Write the todo to file")
 	}
 
@@ -73,12 +72,13 @@ func addFunc(args []string) error {
 func deleteFunc(args []string) error {
 	todoNo, err := mangoUtils.ValidateArgs(args)
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return err
 	}
 
 	// If not exist bucket, make bucket
-	err = mangoUtils.CheckBucketAndMake()
+	if err := mangoUtils.CheckBucketAndMake(); err != nil {
+		return err
+	}
 
 	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
@@ -88,8 +88,7 @@ func deleteFunc(args []string) error {
 	defer db.Close()
 
 	// check data from key
-	err = mangoUtils.CheckKey(todoNo)
-	if err != nil {
+	if err := mangoUtils.CheckKey(todoNo); err != nil {
 		return err
 	}
 
@@ -119,7 +118,9 @@ func listFunc(args []string) error {
 	}
 
 	// If not exist bucket, make bucket
-	err := mangoUtils.CheckBucketAndMake()
+	if err := mangoUtils.CheckBucketAndMake(); err != nil {
+		return err
+	}
 
 	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0600, &bolt.Options{Timeout: 1 * time.Second})
@@ -137,10 +138,11 @@ func listFunc(args []string) error {
 
 		b.ForEach(func(k, v []byte) error {
 			var todo Todo
-			err := json.Unmarshal(v, &todo)
-			if err != nil {
+
+			if err := json.Unmarshal(v, &todo); err != nil {
 				return err
 			}
+
 			todos = append(todos, todo)
 			return nil
 		})
@@ -164,16 +166,19 @@ func doneFunc(args []string) error {
 	}
 
 	// If not exist bucket, make bucket
-	err = mangoUtils.CheckBucketAndMake()
+	if err := mangoUtils.CheckBucketAndMake(); err != nil {
+		return err
+	}
 
 	// check data from key
-	err = mangoUtils.CheckKey(todoNo)
-	if err != nil {
+	if err := mangoUtils.CheckKey(todoNo); err != nil {
 		return err
 	}
 
 	// update isCheck to true
-	updateIsChecked(todoNo, 1)
+	if err:= updateIsChecked(todoNo, 1); err != nil {
+		return err
+	}
 
 	fmt.Printf("Todo #%d was done\n", todoNo)
 
@@ -191,16 +196,19 @@ func unDoneFunc(args []string) error {
 	}
 
 	// If not exist bucket, make bucket
-	err = mangoUtils.CheckBucketAndMake()
+	if err := mangoUtils.CheckBucketAndMake(); err != nil {
+		return err
+	}
 
 	// check data from key
-	err = mangoUtils.CheckKey(todoNo)
-	if err != nil {
+	if err := mangoUtils.CheckKey(todoNo); err != nil {
 		return err
 	}
 
 	// update isCheck to false
-	updateIsChecked(todoNo, 0)
+	if err:= updateIsChecked(todoNo, 0); err != nil {
+		return err
+	}
 
 	fmt.Printf("Todo #%d was undone\n", todoNo)
 
