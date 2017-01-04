@@ -150,7 +150,9 @@ func listFunc(args []string) error {
 	})
 
 	// print todos
-	PrintTodos(todos)
+	if err := PrintTodos(todos); err != nil {
+		return err
+	}
 
 	return err
 }

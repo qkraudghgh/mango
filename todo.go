@@ -18,7 +18,7 @@ type Todo struct {
 }
 
 // PrintTodos is draw todo tasks to terminal
-func PrintTodos(todos []Todo) {
+func PrintTodos(todos []Todo) error {
 	if len(todos) > 0 {
 		bold := color.New(color.Bold).SprintFunc()
 
@@ -31,6 +31,8 @@ func PrintTodos(todos []Todo) {
 	} else {
 		fmt.Println("There is not Todo")
 	}
+
+	return nil
 }
 
 // return different check symbol depend on OS
