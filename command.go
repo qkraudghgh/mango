@@ -169,8 +169,7 @@ func doneFunc(args []string) error {
 	// validate arguments
 	todoNo, err := mangoUtils.ValidateArgs(args)
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return err
 	}
 
 	// If not exist bucket, make bucket
@@ -199,8 +198,7 @@ func unDoneFunc(args []string) error {
 	// validate arguments
 	todoNo, err := mangoUtils.ValidateArgs(args)
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return err
 	}
 
 	// If not exist bucket, make bucket
