@@ -16,7 +16,7 @@ USAGE:
    mango command [arguments...]
 
 VERSION:
-   1.0.0
+   1.1.0
 
 AUTHOR:
   myoungho.pak - <qkraudghgh@gmail.com>
@@ -27,7 +27,7 @@ COMMANDS:
    done [number] - Check done your todo
    undone [number] - Uncheck done your todo
    delete [number] - Delete your todo
-   clear - Clear your todo
+   clear - clear your todo DB
 `
 
 func main() {

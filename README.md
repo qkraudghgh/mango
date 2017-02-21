@@ -20,6 +20,7 @@
 - If you want to check done, you can.
 - If you want to uncheck done, you can.
 - If you want to delete todo, you can.
+- If you want to clear todo DB, you can.
 
 That's all
 
@@ -33,7 +34,7 @@ USAGE:
    mango command [arguments...]
 
 VERSION:
-   1.0.0
+   1.1.0
 
 AUTHOR:
   myoungho.pak - <qkraudghgh@gmail.com>
@@ -44,6 +45,7 @@ COMMANDS:
    done [number] - check done your todo
    undone [number] - uncheck done your todo
    delete [number] - delete your todo
+   clear - clear your todo DB
 ```
 
 ## License
