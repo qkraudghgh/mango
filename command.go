@@ -40,9 +40,9 @@ var (
 		Run:   unDoneFunc,
 	}
 	clearCommand = manager.Command{
-		Name: "clear",
+		Name:  "clear",
 		Usage: "clear : mango clear",
-		Run: clearFunc,
+		Run:   clearFunc,
 	}
 )
 
