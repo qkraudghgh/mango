@@ -10,14 +10,14 @@ import (
 func TestCreateBucketFunc(t *testing.T) {
 	t.Log("Create Mango Bucket")
 
-	defer TestClearFunc(t)
+	defer teardownTestCase(t)
 
 	if err := mangoUtils.CheckBucketAndMake(); err != nil {
 		t.Errorf("Error occur when make bucket: %v", err)
 	}
 }
 
-func TestClearFunc(t *testing.T) {
+func teardownTestCase(t *testing.T) {
 	t.Log("Clear DB testcase")
 
 	os.Remove(mangoUtils.GetDbPath())
@@ -26,8 +26,7 @@ func TestClearFunc(t *testing.T) {
 func TestAddFunc(t *testing.T) {
 	t.Log("Add Todo testcase")
 
-	TestCreateBucketFunc(t)
-	defer TestClearFunc(t)
+	defer teardownTestCase(t)
 
 	var args []string
 
@@ -42,8 +41,7 @@ func TestAddFunc(t *testing.T) {
 func TestDeleteFunc(t *testing.T) {
 	t.Log("Delete Todo testcase")
 
-	TestCreateBucketFunc(t)
-	defer TestClearFunc(t)
+	defer teardownTestCase(t)
 
 	var args []string
 
@@ -73,8 +71,7 @@ func TestDeleteFunc(t *testing.T) {
 func TestDoneFunc(t *testing.T) {
 	t.Log("Done Todo testcase")
 
-	TestCreateBucketFunc(t)
-	defer TestClearFunc(t)
+	defer teardownTestCase(t)
 
 	var args []string
 
@@ -104,8 +101,7 @@ func TestDoneFunc(t *testing.T) {
 func TestUnDoneFunc(t *testing.T) {
 	t.Log("Done Todo testcase")
 
-	TestCreateBucketFunc(t)
-	defer TestClearFunc(t)
+	defer teardownTestCase(t)
 
 	var args []string
 
