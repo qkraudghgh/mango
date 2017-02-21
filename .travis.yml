@@ -9,4 +9,4 @@ install:
   - go get github.com/fatih/color
   - go get github.com/boltdb/bolt
 
-script: go test
+script: go test -v
