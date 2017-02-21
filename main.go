@@ -24,9 +24,10 @@ AUTHOR:
 COMMANDS:
    list - Show your todos
    add "your todo" - Add your todo
-   done [number] - check done your todo
-   undone [number] - uncheck done your todo
-   delete [number] - delete your todo
+   done [number] - Check done your todo
+   undone [number] - Uncheck done your todo
+   delete [number] - Delete your todo
+   clear - Clear your todo
 `
 
 func main() {
@@ -44,6 +45,7 @@ func main() {
 	mango.AddCommand(deleteCommand)
 	mango.AddCommand(doneCommand)
 	mango.AddCommand(unDoneCommand)
+	mango.AddCommand(clearCommand)
 
 	args := flag.Args()
 

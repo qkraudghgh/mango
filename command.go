@@ -10,6 +10,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/qkraudghgh/mango/manager"
 	"github.com/qkraudghgh/mango/utils"
+	"os"
 )
 
 var (
@@ -37,6 +38,11 @@ var (
 		Name:  "undone",
 		Usage: "undone : mango undone [number]",
 		Run:   unDoneFunc,
+	}
+	clearCommand = manager.Command{
+		Name: "clear",
+		Usage: "clear : mango clear",
+		Run: clearFunc,
 	}
 )
 
@@ -213,6 +219,21 @@ func unDoneFunc(args []string) error {
 	}
 
 	fmt.Printf("Todo #%d was undone\n", todoNo)
+
+	return nil
+}
+
+// mango clear
+func clearFunc(args []string) error {
+	// check arguments
+	if len(args) != 0 {
+		return errors.New("The clear command do not use argument")
+	}
+
+	// delete Db file
+	os.Remove(mangoUtils.GetDbPath())
+
+	fmt.Println("Todo is clear")
 
 	return nil
 }
