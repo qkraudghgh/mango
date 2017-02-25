@@ -31,7 +31,7 @@ var (
 	}
 	doneCommand = manager.Command{
 		Name:  "done",
-		Usage: "done : mango done [number]",
+		Usage: "done   : mango done [number]",
 		Run:   doneFunc,
 	}
 	unDoneCommand = manager.Command{
@@ -41,7 +41,7 @@ var (
 	}
 	clearCommand = manager.Command{
 		Name:  "clear",
-		Usage: "clear : mango clear",
+		Usage: "clear  : mango clear",
 		Run:   clearFunc,
 	}
 )
