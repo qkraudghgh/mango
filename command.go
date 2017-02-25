@@ -86,17 +86,17 @@ func deleteFunc(args []string) error {
 		return err
 	}
 
+	// check data from key
+	if err := mangoUtils.CheckKey(todoNo); err != nil {
+		return err
+	}
+
 	// connect to DB
 	db, err := bolt.Open(mangoUtils.GetDbPath(), 0755, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
-
-	// check data from key
-	if err := mangoUtils.CheckKey(todoNo); err != nil {
-		return err
-	}
 
 	// delete data
 	err = db.Update(func(tx *bolt.Tx) error {
